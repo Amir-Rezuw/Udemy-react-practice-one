@@ -1,9 +1,9 @@
-import AddUser from "./Components/Users/AddUser";
+import HomeLayout from "./Components/UI/Layout/HomeLayout";
 
 function App() {
   return (
     <div>
-      <AddUser />
+      <HomeLayout />
     </div>
   );
 }

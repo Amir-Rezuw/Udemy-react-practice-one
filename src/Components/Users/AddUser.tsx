@@ -1,59 +1,56 @@
 import { useForm } from "react-hook-form";
 import Card from "../UI/shared/Card";
 import Button from "../UI/shared/Button";
-type IUserInputs = {
-  username: string;
-  age: number;
-};
-const AddUser = () => {
+import LabeledInput from "../UI/shared/LabeledInput";
+import { IUserInputs } from "../../Types/Common";
+import { Dispatch, SetStateAction } from "react";
+import { v4 as uuid } from "uuid";
+const AddUser = ({
+  setUsersList,
+}: {
+  setUsersList: Dispatch<SetStateAction<IUserInputs[]>>;
+}) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<IUserInputs>();
 
   const onSubmit = (data: IUserInputs) => {
-    console.log(data);
+    const idAddedData = { ...data, id: uuid() };
+    setUsersList((perviousUsers: IUserInputs[]) => {
+      return [...perviousUsers, idAddedData];
+    });
+    reset();
   };
   return (
     <Card className="my-8 mx-auto p-4 w-11/12 max-w-2xl text-black">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <label
-          className="font-bold mb-2 block"
-          htmlFor="username"
-        >
-          Username
-        </label>
-        <input
-          className={`block rounded-md transition duration-500 w-full border border-ccc p-1 mb-2 focus:border focus:border-purple-600 focus:outline-none ${
-            errors.username && "border border-red-500"
-          }`}
+        <LabeledInput<IUserInputs>
           type="text"
-          {...register("username", { required: true })}
+          inputName="name"
+          label="Username"
+          register={register}
+          required
+          error={errors.name}
+          errorMessage="This field is required"
         />
-        {errors.username && (
-          <div className="font-extrabold text-red-500">
-            This field is required
-          </div>
-        )}
-        <label
-          className="font-bold mb-2 block"
-          htmlFor="age"
-        >
-          Age (Years)
-        </label>
-        <input
-          className={`block rounded-md transition duration-500 w-full border border-ccc p-1 mb-2 focus:border focus:border-purple-600 focus:outline-none ${
-            errors.age && "border border-red-500"
-          }`}
+        <LabeledInput<IUserInputs>
+          inputName="age"
+          label="Age (Years)"
+          register={register}
           type="number"
-          {...register("age", { required: true })}
+          error={errors.age}
+          errorMessage={
+            errors.age?.type === "min"
+              ? "Entered value is not valid, age must be 1 or greater."
+              : "This field is required"
+          }
+          inputAdditionalStyles={errors.age && "border border-red-500"}
+          required
+          min={1}
         />
-        {errors.age && (
-          <div className="font-extrabold text-red-500">
-            This field is required
-          </div>
-        )}
         <Button
           title="Add User"
           type="submit"
